@@ -8,10 +8,10 @@
 #include <unordered_map>
 using namespace std;
 
-unordered_map<int, bool> state;
+
 
 bool dfs(vector<int>& nums, int idx, vector<int>& bucket, int per);
-bool dfs(vector<int>& nums, int idx, vector<int>& bucket, int bucket_num, int per, int used);
+bool dfs(vector<int>& nums, int idx, vector<int>& bucket, int bucket_num, int per, int used, unordered_map<int, bool>& dp);
 
 class Solution {
 public:
@@ -27,7 +27,8 @@ public:
             return false;
         vector<int> bucket(k + 1, 0);
         int used = 0;
-        return dfs(nums, 0, bucket, k, per, used);
+        unordered_map<int, bool> dp;
+        return dfs(nums, 0, bucket, k, per, used, dp);
 //        return dfs(nums, 0, bucket, per);
     }
 };
@@ -50,16 +51,20 @@ bool dfs(vector<int>& nums, int idx, vector<int>& bucket, int per) {
     return false;
 }
 
-bool dfs(vector<int>& nums, int idx, vector<int>& bucket, int bucket_num, int per, int used) {
+bool dfs(vector<int>& nums, int idx, vector<int>& bucket, int bucket_num, int per, int used, unordered_map<int, bool>& dp) {
 //    printf("bucket num: %d\n", bucket_num);
     if (bucket_num == 0)
         return true;
     if (bucket[bucket_num] == per) {
 //        printf("bucket %d success\n", bucket_num);
-        bool res =  dfs(nums, 0, bucket, bucket_num - 1, per, used);
+        bool res =  dfs(nums, 0, bucket, bucket_num - 1, per, used, dp);
+        dp[used] = res;
 //        state[used] = res;
         return res;
     }
+
+    if (dp.find(used) != dp.end())
+        return dp[used];
 
     for (unsigned i = idx; i < nums.size(); ++i) {
         int flag = 1 << i ;
@@ -70,7 +75,7 @@ bool dfs(vector<int>& nums, int idx, vector<int>& bucket, int bucket_num, int pe
         bucket[bucket_num] += nums[i];
         used |= flag;
 //        printf("bucket %d: %d, used: %d, cur_index: %d\n", bucket_num, bucket[bucket_num], used, i);
-        if (dfs(nums, i + 1, bucket, bucket_num, per, used))
+        if (dfs(nums, i + 1, bucket, bucket_num, per, used, dp))
             return true;
         bucket[bucket_num] -= nums[i];
         used ^= flag;
