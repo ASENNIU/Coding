@@ -13,7 +13,7 @@ int accumulate(int hight, int n);
 int main()
 {
     int n, m;
-    long long right = 2 * 1e9, left = 0, mid = (right + left) >> 1;
+    int right = 2 * 1e9, left = 0, mid = (right + left) >> 1;
     scanf("%d %d", &n, &m);
     for (unsigned i = 0; i < n; ++i) {
         scanf("%d", trees + i);
@@ -21,14 +21,14 @@ int main()
 
     while (left < right) {
         long long get = accumulate(mid, n);
-        if(get <= m) {
+        if(get >= m) {
             left = mid + 1;
         } else {
             right = mid;
         }
         mid = (right + left) >> 1;
     }
-    scanf("%d\n", left);
+    printf("%d\n", left -1);
     return 0;
 }
 
