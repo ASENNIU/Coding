@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstring>
 #include <algorithm>
+#include <cmath>
 
 #define N 17
 
@@ -28,34 +29,32 @@ int main()
     for (unsigned i = 1; i <= n; ++i) {
         dp[i][1 << (i - 1)] = dist[0][i];
     }
-    for (unsigned k = 1; k < (1 << n); ++k) {
-        for (unsigned i = 1; i <= n; ++i) {
+    for (int k = 1; k < (1 << n); ++k) {
+        for (int i = 1; i <= n; ++i) {
             if ((k & (1 << (i - 1))) == 0) {
                 continue;
             }
             for (unsigned j = 1; j <= n; ++j) {
-                if (i == j) {
+                if (i == j || (k & (1 << (j - 1))) == 0) {
                     continue;
                 }
-                if ((k & (1 << (j - 1))) == 0) {
-                    continue;
-                }
-                dp[i][k] = std::min(dp[i][k], dp[j][k - (1 << (i - 1))] + dist[j][i]);
+              
+                dp[i][k] = std::min(dp[i][k], dp[j][k ^ (1 << (i - 1))] + dist[i][j]);
             }
         }
     }
     double ans = dp[0][0];
     int k = (1 << n) - 1;
-    for (unsigned i = 1; i <= n; ++i) {
+    for (int i = 1; i <= n; ++i) {
         ans = std::min(ans, dp[i][k]);
     }
-    printf("%f\n", ans);
+    printf("%.2f\n", ans);
 
     return 0;
 }
 
 double distance(double x1, double y1, double x2, double y2) {
-    return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+    return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
 void init() {
